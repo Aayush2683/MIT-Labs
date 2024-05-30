@@ -1,0 +1,138 @@
+set serveroutput on;
+DECLARE 
+	CURSOR C1 is select * from Department1; 
+	vBudget Department.Budget%Type :=0;
+	vdname Department.dept_name%TYPE; 
+BEGIN 
+	For dept in C1 LOOP 
+	IF dept.Budget > vBudget THEN 
+		vBudget := dept.Budget; 
+		vdname := dept.dept_name; 
+	END IF; 
+END LOOP; 
+	Dbms_output.put_line('Max. Budget: ' || vBudget || ' Dept: ' || vdname);
+END;	
+
+1)
+CREATE TABLE salary_raise(
+  Instructor_ID NUMBER(5),
+  Raise_date DATE,
+  Raise_amt NUMERIC(10,2)
+);
+
+DECLARE
+	CURSOR raise_cursor IS
+	SELECT * FROM Instructor WHERE dept_name = 'Comp.Sci.' FOR UPDATE;
+	raise_amt NUMERIC(8, 2);
+
+BEGIN
+	FOR i IN raise_cursor LOOP
+		raise_amt := i.salary * 1.05;
+		UPDATE Instructor SET salary = salary * 1.05;
+		INSERT INTO salary_raise VALUES (i.ID, CURRENT_DATE, raise_amt);
+	END LOOP;
+END;
+/
+
+SELECT * FROM salary_raise;
+
+2)
+
+DECLARE
+	CURSOR cred_cursor IS select * from student order by tot_cred;
+	newrow student%ROWTYPE;
+BEGIN
+	OPEN cred_cursor;
+	LOOP
+   	EXIT WHEN (cred_cursor%ROWCOUNT > 9) OR (cred_cursor%NOTFOUND);
+	fetch cred_cursor into newrow;
+	dbms_output.put_line(newrow.id || '    ' || newrow.name || '    ' || newrow.dept_name || '    ' || newrow.tot_cred);
+	END LOOP;
+   	CLOSE cred_cursor;
+END;
+/
+
+
+3)
+DECLARE
+	CURSOR c is select course_id, title, dept_name, credits, tot from course natural join ( select course_id, count(*) as tot from takes group by course_id ); 
+BEGIN 
+    FOR course in c 
+    LOOP 
+	DBMS_OUTPUT.PUT_LINE( 'ID: ' || course.course_id || '   Title: ' || course.title || '   Dept: ' || course.dept_name || '   Credits: ' || course.credits || '   Total ' || course.tot ); 
+    END LOOP; 
+END;
+/
+
+4)
+DECLARE
+	CURSOR filter IS select * from takes where course_id = 'CS-101'; 
+	cre student.tot_cred %TYPE; 
+	cnt number(8); 
+BEGIN 
+cnt := 0; 
+    FOR s IN filter 
+    loop select tot_cred into cre from student where id = s.id; 
+        if cre < 50 then delete from takes where course_id = 'CS-101' and id = s.id; 
+            DBMS_OUTPUT.PUT_LINE('deleted : ' || s.id || ' credits : ' || cre); 
+            cnt := cnt + 1; 
+        end if; 
+    END LOOP; 
+    DBMS_OUTPUT.PUT_LINE( cnt || ' students de-enrolled from the course CS-101' ); 
+END;
+/
+
+5)
+DECLARE
+cursor c is select * from studenttable for update; 
+BEGIN
+	FOR stu in c 
+	LOOP
+		IF stu.gpa > 4 and stu.gpa <= 5 then update studenttable set LetterGrade = 'E' where current of c; 
+        	ELSIF stu.gpa > 5 and stu.gpa <= 6 then update studenttable set LetterGrade = 'D' where current of c; 
+        	ELSIF stu.gpa > 6 and stu.gpa <= 7 then update studenttable set LetterGrade = 'C' where current of c; 
+        	ELSIF stu.gpa > 7 and stu.gpa <= 8 then update studenttable set LetterGrade = 'B' where current of c; 
+        	ELSIF stu.gpa > 8 and stu.gpa <= 9 then update studenttable set LetterGrade = 'A' where current of c; 
+        	ELSIF stu.gpa > 9 and stu.gpa <= 10 then update studenttable set LetterGrade = 'A+' where current of c; 
+		ELSE update studenttable set LetterGrade = 'F' where current of c;
+        	END IF; 
+    END LOOP;
+END;
+/
+select * from studenttable;
+
+
+6)
+DECLARE 
+CURSOR c1(c_id teaches.course_id%TYPE) IS select * from (instructor natural join teaches) where course_id = c_id; 
+temp teaches.course_id%TYPE; 
+BEGIN 
+	temp := '&Course_ID'; 
+	FOR info in c1(temp) 
+	LOOP
+	DBMS_OUTPUT.PUT_LINE(info.name); 
+	END LOOP;
+END; 
+/
+
+7)
+
+DECLARE 
+	CURSOR a IS select unique t.id as s, s.id as i from takes t, teaches s where t.course_id = s.course_id; 
+	CURSOR b(s student.id %type, i instructor.id %type) is select unique s_id from advisor where s_id = s and i_id = i; 
+	st student %rowtype; 
+	cnt number(8); 
+BEGIN
+	cnt := 0; 
+	FOR tuple in a 
+	LOOP
+		FOR stu in b(tuple.s, tuple.i) 
+		LOOP
+			select * into st from student where id = stu.s_id; 
+			DBMS_OUTPUT.PUT_LINE(st.name || ' ' || st.id || ' ' || st.dept_name); 
+			cnt := cnt + 1; 
+		END LOOP;
+	END LOOP; 
+	DBMS_OUTPUT.PUT_LINE(cnt || ' rows selected'); 
+END; 
+/

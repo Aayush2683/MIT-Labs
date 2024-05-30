@@ -1,0 +1,79 @@
+1)
+create table log_change_takes
+	(time_of_change date, ID varchar(5), course_id	varchar(8),sec_id varchar(8),semester varchar(6),year numeric(4,0), grade varchar(2), primary key (ID, course_id, sec_id, semester, year), foreign key (ID) references student on delete cascade);
+
+create or replace trigger log_trigger
+after insert or update on takes
+for each row
+begin
+	insert into log_change_takes 	values(current_date, :new.id, :new.course_id, :new.sec_id, :new.semester, :new.year, :new.grade);
+end;
+/
+
+2)
+create table old_data_instructor(id varchar(5) NOT NULL, Name varchar(20) NOT NULL, dept_name varchar(20), salary number(8,2));
+
+create or replace trigger ins_trigger
+before update of salary on instructor
+for each row
+begin
+    insert into old_data_instructor values(:old.id, :old.name, :old.dept_name, :old.salary);
+end;
+/
+
+3)
+create or replace trigger check_trigger 
+before insert or update on instructor
+for each row
+declare 
+    budg numeric(12,2);
+begin
+    if (:new.name not like '%[a-zA-Z]%') then 
+        raise_application_error(-20000, 'Name must contain alphabets only');
+    end if;
+    if (:new.salary <= 0) then  
+        raise_application_error(-20001, 'Salary must be positive');
+    end if;
+
+    select budget into budg from department where dept_name = :new.dept_name;
+    if (:new.salary > budg) then 
+        raise_application_error(-20002, 'Salary Exceeds Department Budget');
+    end if;
+end;
+/
+
+4)
+
+create table client_master(client_no varchar(4) primary key, name varchar(20) not null,address varchar(30), bal_due numeric(9,2));
+
+insert into client_master values(1212,'Abcd','123-ParkLane',25000);
+insert into client_master values(1224,'Efgh','245-SeaLane',30000);
+insert into client_master values(1236,'Ijkl','361-GardenLane',35000);
+insert into client_master values(1248,'Mnop','345-LakeLane',26000);
+
+create table auditclient(client_no varchar(4),name varchar(20) not null,bal_due numeric(9,2), operation varchar(6),userid varchar(5),opdate date);
+
+create or replace trigger audit_trigger 
+before update or delete on client_master
+for each row
+begin
+    case 
+        when updating then 
+            insert into auditclient values(:old.client_no, :old.name, :old.bal_due, 'UPDATE', user, current_date);
+        when deleting then 
+            insert into auditclient values(:old.client_no, :old.name, :old.bal_due, 'DELETE', user, current_date);
+    end case;
+end;
+/
+
+5)
+create view advisor_student as select * from advisor natural join (select id s_id, name s_name, dept_name s_dept_name, tot_cred from student) natural join (select id i_id, name i_name, dept_name i_dept_name, salary from instructor);
+
+create or replace trigger as_trigger
+instead of delete on advisor_student 
+for each row
+begin
+	delete from advisor where i_id = :old.i_id or s_id = :old.s_id;
+end;
+/
+

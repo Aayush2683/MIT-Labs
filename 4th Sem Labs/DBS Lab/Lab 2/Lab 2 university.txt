@@ -1,0 +1,91 @@
+@"C:\Users\ugcse\Desktop\orcl\University.sql"
+@"C:\Users\ugcse\Desktop\orcl\smallRelations.sql"
+
+9)
+select name,dept_name 
+from student;
+
+10)
+select name
+from instructor 
+where dept_name = 'Comp. Sci.';
+
+11)
+select title 
+from course 
+where dept_name = 'Comp. Sci.' and credits = 3;
+
+12)
+select course_id,title 
+from takes natural join course 
+where ID = '12345';
+
+13)
+select name,salary from instructor where salary >40000 and salary <90000;
+
+14)
+select ID,name from instructor where ID not in (select ID from teaches);
+
+15)
+
+
+16)
+select name,C.course_id,title as c_name from student S,takes T,course C where S.ID = T.ID and C.course_id = T.course_id and year = 2015;
+
+17)
+ select name,salary as inst_salary from instructor where salary > some (select salary from instructor where dept_name = 'Comp. Sci.');
+
+18)
+select * from instructor where dept_name like '%ch%';
+
+19)
+select name, length(name) as length from student;
+
+20)
+select dept_name,SUBSTR(dept_name, 3, 3 ) from department;
+
+21)
+select Upper(name) from instructor;
+
+22)
+update teaches set sec_id = 0 where sec_id = NULL;
+
+23)
+select salary,round(salary,-2) from instructor;
+
+24)
+select to_char(to_date(dob,'DD-MON-YY'),'DD-MON-YYYY') from employee;
+select to_date(dob , 'DD-MM-YY') from employee;
+select to_char(to_date(dob,'DD-MON-YY'),'DD-MM-YYYY') from employee;
+
+25)
+SELECT emp_name,TO_CHAR(dob, 'YEAR')from employee;
+SELECT emp_name,TO_CHAR(dob, 'Year') from employee;
+SELECT emp_name,TO_CHAR(dob, 'year') from employee;
+
+26)
+select emp_name, to_char(dob,'DAY') from employee;
+select emp_name, to_char(dob,'Day') from employee;
+
+27)
+select emp_name, to_char(dob,'MONTH') from employee;
+select emp_name, to_char(dob,'Month') from employee;
+
+28)
+select last_day(dob) from employee where emp_name = 'Alex';
+
+29)
+select round(months_between(TRUNC(sysdate),to_date(dob,'DD-MON-YY'))/12 , 0) as age from employee;
+
+31)
+select dob from employee where to_char(dob,'YYYY') = 2000
+
+32)
+select dob from employee where to_char(dob,'YYYY') between 2001 and 2003;
+
+33)
+
+
+
+
+

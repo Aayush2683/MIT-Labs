@@ -1,0 +1,211 @@
+1)
+
+create table student(RollNo number(2), gpa numeric(4,2));
+insert into Student values(1,5.8);
+insert into Student values(2,6.5);
+insert into Student values(3,3.4);
+insert into Student values(4,7.8);
+insert into Student values(5,9.5);
+
+set serveroutput on;
+DECLARE
+r student.rollno%TYPE;
+g student.gpa%TYPE;
+BEGIN
+r:='&rollno';
+select gpa into g from student where r = RollNo;
+DBMS_OUTPUT.PUT_LINE(g);
+END;
+/
+
+2)
+
+DECLARE
+grade NUMBER(4,2);
+BEGIN
+grade := '&g';
+IF grade>=9 and grade<=10 THEN
+DBMS_OUTPUT.PUT_LINE('A+');
+ELSIF grade>=8 and grade<9 THEN
+DBMS_OUTPUT.PUT_LINE('A');
+ELSIF grade>=7 and grade<8 THEN
+DBMS_OUTPUT.PUT_LINE('B');
+ELSIF grade>=6 and grade<7 THEN
+DBMS_OUTPUT.PUT_LINE('C');
+ELSIF grade>=5 and grade<6 THEN
+DBMS_OUTPUT.PUT_LINE('D');
+ELSIF grade>=4 and grade<5 THEN
+DBMS_OUTPUT.PUT_LINE('D');
+ELSE
+DBMS_OUTPUT.PUT_LINE('F');
+END IF;
+END;
+/
+
+3)
+
+DECLARE
+	doi date;
+	dor date;
+	diff number(10);
+	penalty number(10);
+BEGIN
+	doi:= to_date('&i','DD-MM-YYYY');
+	dor:= to_date('&r','DD-MM-YYYY');
+	
+	diff := to_date(doi - dor,'DD');
+		DBMS_OUTPUT.PUT_LINE('Number of Days: '||diff);
+	IF diff between 0 and 7 then
+		penalty := 0;
+		DBMS_OUTPUT.PUT_LINE('NIL');
+	ELSIF diff between 8 and 15 then
+		penalty:=(diff-7)*0+(diff-8)*1;
+		DBMS_OUTPUT.PUT_LINE(penalty);
+	ELSIF diff between 16 and 30 then
+		penalty:=(diff-7)*0+(diff-8)*1+(diff-15)*2;
+		DBMS_OUTPUT.PUT_LINE(penalty);
+	ELSE
+		penalty:=(diff-7)*0+(diff-8)*1+(diff-15)*2+(diff-30)*5;
+		DBMS_OUTPUT.PUT_LINE(penalty);
+	END IF;
+END;
+/
+
+4)
+set serveroutput on;
+DECLARE
+i NUMBER(1);
+grade student.gpa%TYPE;
+lg Varchar(2);
+BEGIN
+	for i in 1..5 LOOP
+		select gpa into grade from student where RollNo = i;
+		IF grade>9 THEN
+			lg := 'A+';
+		ELSIF grade>=8 THEN
+			lg := 'A';
+		ELSIF grade>=7 THEN
+			lg := 'B';
+		ELSIF grade>=6 THEN
+			lg := 'C';
+		ELSIF grade>=5 THEN
+			lg := 'D';
+		ELSIF grade>=4 THEN
+			lg := 'E';
+		ELSE
+			lg := 'F';
+		END IF;
+		DBMS_OUTPUT.PUT_LINE(lg);
+	END LOOP;
+END;
+/
+
+5)
+alter table Student add LetterGrade Varchar(2);
+
+DECLARE
+grade student.gpa%TYPE;
+lg student.lettergrade%TYPE;
+BEGIN
+	for i in 1..5 
+	LOOP
+		select gpa into grade from student where RollNo = i;
+		IF grade>9 THEN
+			DBMS_OUTPUT.PUT_LINE('HERE');
+			lg := 'A+';
+		ELSIF grade>=8 THEN
+			lg := 'A';
+		ELSIF grade>=7 THEN
+			lg := 'B';
+		ELSIF grade>=6 THEN
+			lg := 'C';
+		ELSIF grade>=5 THEN
+			lg := 'D';
+		ELSIF grade>=4 THEN
+			lg := 'E';
+		ELSE
+			lg := 'F';
+		END IF;
+		update student set lettergrade = lg where RollNo = i;
+	END LOOP;
+END;
+/
+
+6)
+DECLARE
+grade student.gpa%TYPE;
+maxi student.gpa%TYPE;
+i NUMBER(1);
+BEGIN
+	maxi := 0;
+	for i in 1..5 LOOP
+		select gpa into grade from student where RollNo = i;
+		IF maxi = 0 or maxi<grade THEN
+			maxi := grade;
+		END IF;
+	END LOOP;
+	DBMS_OUTPUT.PUT_LINE('Max GPA: '||maxi);
+END;
+/
+
+7)
+set serveroutput on;
+DECLARE
+i NUMBER(1);
+grade student.gpa%TYPE;
+lg Varchar(2);
+BEGIN
+	for i in 1..5 LOOP
+		select gpa into grade from student where RollNo = i;
+		IF grade>9 THEN
+			lg := 'A+';
+			GOTO print_now;
+		ELSIF grade>=8 THEN
+			lg := 'A';
+			GOTO print_now;
+		ELSIF grade>=7 THEN
+			lg := 'B';
+			GOTO print_now;
+		ELSIF grade>=6 THEN
+			lg := 'C';
+			GOTO print_now;
+		ELSIF grade>=5 THEN
+			lg := 'D';
+			GOTO print_now;
+		ELSIF grade>=4 THEN
+			lg := 'E';
+			GOTO print_now;
+		ELSE
+			lg := 'F';
+			GOTO print_now;
+		END IF;
+		<<print_now>>
+			DBMS_OUTPUT.PUT_LINE(lg);
+	END LOOP;
+END;
+/
+
+8)
+set serveroutput on;
+DECLARE
+	MULTIPLE_ROWS TOO_MANY_ROWS;
+	NO_INST NO_DATA_FOUND;
+	row student%ROWTYPE;
+	iname = instrutor.name%TYPE;
+BEGIN
+	iname := '&nam';
+	select all into row from instructor where name = iname; 
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+

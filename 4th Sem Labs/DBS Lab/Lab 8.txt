@@ -1,0 +1,140 @@
+1)
+set serveroutput on;
+create or replace procedure goodday is
+begin
+dbms_output.put_line('Good Day to You');
+end;
+ /
+
+declare
+begin
+goodday;
+end;
+/
+
+2)
+set serveroutput on;
+
+create or replace procedure listing(d department.dept_name%type) is
+    cursor c1 is select * from instructor where dept_name=d;
+    cursor c2 is select * from course where dept_name=d;
+begin
+    dbms_output.put_line('Instructors of given department: ' || d);
+    for i in c1 loop 
+        dbms_output.put_line(i.name);
+    end loop;
+
+    dbms_output.put_line('Courses offered by the department ' || d);
+    for c in c2 loop 
+        dbms_output.put_line(c.title);
+    end loop;
+end;
+/
+
+declare 
+    d department.dept_name%type;
+begin
+    d := '&department_name';
+    listing(d);
+end;
+/
+
+3)
+
+set serveroutput on;
+
+create or replace procedure course_popular(d department.dept_name%type) as
+    cidmax course.course_id%type;
+    titlemax course.title%type;
+begin
+        select course_id, title into cidmax, titlemax from 
+            (select course_id, title, count(*) counts from course natural join takes where dept_name=d group by course_id, title order by counts desc)
+                where rownum < 2;
+        dbms_output.put_line(d ||  '        ' || cidmax||  '        ' || titlemax);
+    end;
+/
+
+declare 
+    cursor c1 is select * from department;
+    d department.dept_name%type;
+begin
+    dbms_output.put_line('Department' || '        ' || 'Course ID' ||  '        ' || 'Course Title');
+    for dpt in c1
+    loop
+        course_popular(dpt.dept_name);
+    end loop;
+end;
+/
+
+
+4)
+set serveroutput on;
+
+create or replace procedure list(d department.dept_name%TYPE) IS
+	cursor c1 is select * from student where dept_name = d;
+	cursor c2 is select * from COURSE where dept_name = d;
+begin
+    	DBMS_OUTPUT.PUT_LINE('Students from the given department: ');
+	for s in c1 loop
+		DBMS_OUTPUT.PUT_LINE(s.name);
+	END LOOP;
+	DBMS_OUTPUT.PUT_LINE(' ');
+	DBMS_OUTPUT.PUT_LINE('Courses offered by the department: ' || d);
+    	for c in c2 loop 
+       	DBMS_OUTPUT.PUT_LINE(c.title);
+    	end loop;
+end;
+/
+
+DECLARE
+	d department.dept_name%TYPE;
+BEGIN
+	d := '&department';
+	list(d);
+END;
+/
+
+5)
+set serveroutput on;
+create or replace function square(a number) 
+return number as sq number;
+BEGIN
+	sq := a * a;
+	return sq;
+END;
+/
+
+DECLARE
+	a number;
+BEGIN
+	a := '&Enter_number';
+	DBMS_OUTPUT.PUT_LINE(square(a));
+END;
+/
+
+6)
+
+set serveroutput on;
+create or replace function department_highest(d department.dept_name%TYPE) 
+return instructor.name%TYPE as 
+	insname instructor.name%TYPE;
+BEGIN
+	select name into insname from (select * from instructor where dept_name=d order by salary desc) where rownum < 2;	
+	return insname;
+end;
+/
+
+DECLARE
+	d department.dept_name%TYPE;
+BEGIN
+	d := '&Enter_department_name';
+	DBMS_OUTPUT.PUT_LINE(department_highest(d));
+END;
+/
+
+
+
+
+
+
+

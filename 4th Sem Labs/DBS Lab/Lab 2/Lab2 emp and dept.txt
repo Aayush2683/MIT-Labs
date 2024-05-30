@@ -1,0 +1,38 @@
+1)
+create table employee( empno number(5) primary key,
+				empname varchar(15) not null,
+				gender char(1) not null,
+				salary numeric(9,2) not null,
+				address varchar(30) not null,
+				dno number(2),
+				check (gender in ('M','F')),
+				foreign key(dno) references department);
+
+2) 
+create table Department (DeptNo number(2) primary key, DeptName varchar(20) not null, Location varchar(20));
+
+3)alter table employee add foreign key (dno) references department
+
+4)
+insert into department values(10,'Comp Sci','AB5');
+insert into department values(11,'ECE','AB5');
+insert into department values(12,'DSE','AB4');
+insert into department values(13,'EEE','AB5');
+insert into department values(14,'BioTech','AB2');
+
+insert into employee values(1,'Ab','F',250000,'Manipal',10);
+insert into employee values(2,'Cd','M',150000,'Udupi',11);
+insert into employee values(3,'Ef','F',130000,'Mangalore',12);
+
+5)
+insert into employee values(3,'Ef','F',130000,'Mangalore',16);
+
+6)
+delete from department where DeptNo = 12
+
+7)
+alter table employee add constraint ref foreign key (dno) references department on delete cascade;
+
+8)
+alter table employee modify salary default 10000;
+insert into employee (empno,empname,gender,address,dno) values(4,'Gh','F','Manipal',13);

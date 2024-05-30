@@ -1,0 +1,52 @@
+1)
+select BDate, address from employee where Fname = 'John' and MINIT = 'B' and Lname = 'Smith';
+select Fname,address from department,employee where Department.dnumber = employee.dno and dname = 'Research';
+
+2)
+
+3)
+select distinct(salary) from employee;
+
+4)
+select fname,lname,S.f, S.l from (select ssn, lname l, fname f from employee) S, employee where employee.super_ssn = S.ssn;
+
+5)
+
+6)
+select * from employee where address like '%Houston%';
+
+7)
+update employee set salary = 1.1*salary where ssn in (select essn from works_on, employee where essn = ssn and pno = 3);
+
+8)
+select * from employee where dno = 5 and salary between 30000 and 40000;
+
+9)
+
+10)
+select * from employee where super_ssn IS null;
+
+11)
+select fname from employee,dependent where ssn = essn and fname = dependent_name and employee.sex = dependent.sex;
+
+12)
+SELECT SSN, fname from employee where ssn not in (select essn from dependent);
+
+13)
+select fname from employee where ssn in (select essn from dependent group by essn having count(essn) > 0) ;
+
+14)
+select essn from works_on where pno in (1,2,3);
+
+15)
+select sum(salary),avg(salary),max(salary), min(salary) from employee;
+
+16)
+select sum(salary),max(salary),min(salary),avg(salary) from department,employee where Department.dnumber = employee.dno and dname = 'Research';
+
+17)
+select pno,pname, P.count from (select count(ESSN) as count,Pno from works_on group by pno) P, project where pnumber = P.pno;
+
+18)
+create view TEMP as (select pno,pname, P.count from (select count(ESSN) as count,Pno from works_on group by pno) P, project where pnumber = P.pno);
+select pname,pno,count from temp where count > 2;
