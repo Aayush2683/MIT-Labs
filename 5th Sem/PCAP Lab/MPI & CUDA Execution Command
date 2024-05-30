@@ -1,0 +1,12 @@
+MPI Execution:
+Compile:
+$mpicc filename.c -o filename.out
+run:
+mpirun -np 4 ./filename.out
+
+CUDA Execution:
+Compile:
+$nvcc filename.cu -o filename
+Run:
+$./filename
+

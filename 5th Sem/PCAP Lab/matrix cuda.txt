@@ -1,0 +1,181 @@
+// 4x4 matrix addition using 2D Grid and 2D Block
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <cuda_runtime.h>
+#define BLOCK_WIDTH 2
+#define TILE_WIDTH 2
+#define WIDTH 4
+__device__ int getTid() {
+int blockSkip = (blockIdx.y * gridDim.x * blockDim.x * blockDim.y);
+int rowSkip = (threadIdx.y * gridDim.x * blockDim.x);
+int rowDisplacement = (blockIdx.x * blockDim.x) + threadIdx.x;
+int tid = blockSkip + rowSkip + rowDisplacement;
+return tid;
+}
+__global__ void MatAddElementThread(int *a, int *b, int *d) {
+int tid = getTid();
+d[tid] = a[tid] + b[tid];
+}
+int main() {
+int *matA, *matB, *matSum;
+int *da, *db, *dc;
+printf("\n== Enter elements of Matrix A (4x4) ==\n");
+matA = (int*)malloc(sizeof(int) * WIDTH * WIDTH);
+for(int i = 0; i < WIDTH * WIDTH; i++)
+{
+scanf("%d", &matA[i]);
+}
+printf("\n== Enter elements of Matrix B (4x4) ==\n");
+matB = (int*)malloc(sizeof(int) * WIDTH * WIDTH);
+for(int i = 0; i < WIDTH * WIDTH; i++)
+{
+scanf("%d", &matB[i]);
+}
+
+matSum = (int*)malloc(sizeof(int) * WIDTH * WIDTH);
+cudaMalloc((void **) &da, sizeof(int) * WIDTH * WIDTH);
+cudaMalloc((void **) &db, sizeof(int) * WIDTH * WIDTH);
+cudaMalloc((void **) &dc, sizeof(int) * WIDTH * WIDTH);
+cudaMemcpy(da, matA, sizeof(int) * WIDTH *WIDTH, cudaMemcpyHostToDevice);
+cudaMemcpy(db, matB, sizeof(int) * WIDTH *WIDTH, cudaMemcpyHostToDevice);
+int NumBlocks = WIDTH / BLOCK_WIDTH;
+dim3 grid_conf (NumBlocks, NumBlocks);
+dim3 block_conf (BLOCK_WIDTH, BLOCK_WIDTH);
+MatAddElementThread<<<grid_conf, block_conf>>>(da, db, dc);
+cudaMemcpy(matSum,dc,sizeof(int)* WIDTH *WIDTH,cudaMemcpyDeviceToHost);
+printf("\n-=Result of Addition=-\n");
+printf(" ————————————\n");
+for (int i = 0; i < m; i++ ) {
+	for (int j = 0; j < n; j++) {
+		printf("%6d ", matSum[i * n + j]);
+	}
+	printf("\n");
+}
+cudaFree(da);
+cudaFree(db);
+cudaFree(dc);
+free(matA);
+free(matB);
+free(matSum);
+return 0;
+}
+
+// 4x4 tiled matrix multiplication using 2D Grid and 2D Block
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <cuda_runtime.h>
+#define BLOCK_WIDTH 2
+#define TILE_WIDTH 2
+#define WIDTH 4
+_
+__global__ void MatMulElementThreadShared(int *a, int *b, int *c) {
+__shared__ int MDs[TILE_WIDTH][TILE_WIDTH];
+__shared__ int NDs[TILE_WIDTH][TILE_WIDTH];
+int m;
+int bx=blockIdx.x; int by=blockIdx.y;
+int tx=threadIdx.x; int ty=threadIdx.y;
+int Row=by*TILE_WIDTH + ty;
+int Col= bx*TILE_WIDTH + tx;
+int Pvalue=0;
+for(m=0; m<WIDTH/TILE_WIDTH; m++)
+{
+MDs[ty][tx]=a[Row*WIDTH+m*TILE_WIDTH+tx];
+NDs[ty][tx]=b[(m*TILE_WIDTH+ty)*WIDTH+Col];
+__syncthreads();
+for (int k = 0; k < TILE_WIDTH; k++)
+{
+Pvalue += MDs[ty][k]*NDs[k][tx];
+}
+__syncthreads();
+}
+c[Row*WIDTH+Col] = Pvalue;
+}
+
+int main() {
+int *matA, *matB, *matProd;
+int *da, *db, *dc;
+printf("\n== Enter elements of Matrix A (4x4) ==\n");
+matA = (int*)malloc(sizeof(int) * WIDTH * WIDTH);
+for(int i = 0; i < WIDTH * WIDTH; i++)
+{
+scanf("%d", &matA[i]);
+}
+printf("\n== Enter elements of Matrix B (4x4) ==\n");
+matB = (int*)malloc(sizeof(int) * WIDTH * WIDTH);
+for(int i = 0; i < WIDTH * WIDTH; i++)
+{
+scanf("%d", &matB[i]);
+}
+matProd = (int*)malloc(sizeof(int) * WIDTH * WIDTH);
+cudaMalloc((void **) &da, sizeof(int) * WIDTH * WIDTH);
+cudaMalloc((void **) &db, sizeof(int) * WIDTH * WIDTH);
+cudaMalloc((void **) &dc, sizeof(int) * WIDTH * WIDTH);
+cudaMemcpy(da, matA, sizeof(int) * WIDTH *WIDTH, cudaMemcpyHostToDevice);
+cudaMemcpy(db, matB, sizeof(int) * WIDTH *WIDTH, cudaMemcpyHostToDevice);
+int NumBlocks = WIDTH / BLOCK_WIDTH;
+dim3 grid_conf (NumBlocks, NumBlocks);
+dim3 block_conf (BLOCK_WIDTH, BLOCK_WIDTH);
+MatMulElementThreadShared<<<grid_conf, block_conf>>>(da, db, dc);
+cudaMemcpy(matProd,dc,sizeof(int)* WIDTH *WIDTH,cudaMemcpyDeviceToHost);
+printf("\n-=Result of Addition=-\n");
+printf(" ————————————\n");
+for (int i = 0; i < m; i++ ) {
+for (int j = 0; j < n; j++) {
+printf("%6d ", matProd[i * n + j]);
+}
+printf("\n");
+}
+cudaFree(da);
+cudaFree(db);
+cudaFree(dc);
+free(matA);
+free(matB);
+free(matProd);
+return 0;
+}
+
+//Matrix Transpose
+
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include <stdio.h>
+#include <stdlib.h>
+__globa__l void transpose(int *a, int *t)
+{
+int n=threadIdx.x, m=blockIdx.x, size=blockDim.x, size1=gridDim.x;
+t[n*size1+m]=a[m*size+n];
+}
+int main(void)
+{
+int *a,*t, m,n,i,j;
+int *d_a,*d_t;
+printf("Enter the value of m: ");scanf("%d",&m);
+printf("Enter the value of n: ");scanf("%d",&n);
+int size=sizeof(int)*m*n;
+a=(int*)malloc(m*n*sizeof(int));
+c=(int*)malloc(m*n*sizeof(int));
+printf("Enter input matrix:\n");
+for(i=0;i<m*n;i++)
+scanf("%d",&a[i]);
+cudaMalloc((void**)&d_a,size);
+
+cudaMalloc((void**)&d_t,size);
+cudaMemcpy(d_a,a,size,cudaMemcpyHostToDevice);
+transpose<<<m,n>>>(d_a,d_t);
+cudaMemcpy(t,d_t,size,cudaMemcpyDeviceToHost);
+printf("Result vector is:\n");
+for(i=0;i<n;i++)
+{
+for(j=0;j<m;j++)
+printf("%d\t",t[i*m+j]);
+printf("\n");
+}
+getchar();
+cudaFree(d_a);
+cudaFree(d_t);
+return 0;
+}
