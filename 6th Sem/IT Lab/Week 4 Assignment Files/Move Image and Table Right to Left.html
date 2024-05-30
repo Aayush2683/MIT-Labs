@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+ div {
+   position: absolute;
+   right: 200px;
+
+ }
+
+ table{
+ border:2px solid black;
+}
+
+ th, td {
+   border: 1px solid black;
+ }
+
+ tr.red {
+   background-color: red;
+ }
+
+ tr.blue {
+   background-color: blue;
+ }
+</style>
+<script src="https://apac01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F3.7.1%2Fjquery.min.js&data=05%7C02%7C%7C8435e793833148761b9708dc2adea4e1%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C638432382953542991%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=xt%2BnHSaLdIkmwYpnVvb%2F4uGzWl1JAPf99eVbnn3FpXg%3D&reserved=0"></script>
+<script> 
+ $(document).ready(function(){
+   $("button").click(function(){
+     $("div").animate({right: '800px'});
+   });
+ });
+</script> 
+</head>
+<body>
+
+<button>Start Animation</button>
+
+<div>
+ <table>
+   <tr class="red">
+     <td>data1</td> <td>data2</td> <td>data3</td>
+   </tr>
+   <tr class="blue">
+     <td>data4</td> <td>data5</td> <td>data6</tr>
+   </tr>
+ <tr class="red">
+     <td>data7</td> <td>data8</td> <td>data9</td>
+   </tr>
+ </table>
+<img src=https://apac01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fth.bing.com%2Fth%2Fid%2FR.ed4c5c82883ef4309eb02f8e2417646c%3Frik%3DL7mq4JeVSZO0Gw%26riu%3Dhttp%253a%252f%252fradiusblocks.com%252fwp-content%252fuploads%252f2022%252f09%252fimage-grid_3.jpg%26ehk%3Dlsdi%252bBpjRQvuIvmtlegfvmYOtqp0reJX%252baon5vAL4F4%253d%26risl%3D%26pid%3DImgRaw%26r%3D0&data=05%7C02%7C%7C8435e793833148761b9708dc2adea4e1%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C638432382953550575%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=GQExxd2Zq4zaPOcaosCdRXx%2BCX3g3jNI2yBxqq57pic%3D&reserved=0</img>
+</div>
+
+</body>
+</html>
