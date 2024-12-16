@@ -73,3 +73,92 @@ int main() {
 
     return 0;
 }
+
+
+// Convert Decimal to Hexadecimal Using Stack
+
+void decimalToHexadecimal(int decimal) {
+    Stack stack;
+    initStack(&stack);
+
+    while (decimal > 0) {
+        int remainder = decimal % 16; 
+        push(&stack, remainder);
+        decimal /= 16;
+    }
+
+    printf("Hexadecimal: ");
+    while (!isEmpty(&stack)) {
+        int value = pop(&stack);
+        if (value < 10) {
+            printf("%d", value);
+        } else {
+            printf("%c", value - 10 + 'A'); 
+        }
+    }
+    printf("\n");
+}
+
+// Convert Binary to Decimal Using Stack
+
+void binaryToDecimal(int binary) {
+    Stack stack;
+    initStack(&stack);
+
+    while (binary > 0) {
+        int digit = binary % 10;
+        push(&stack, digit);
+        binary /= 10;
+    }
+
+    int decimal = 0;
+    int power = 0;
+
+    while (!isEmpty(&stack)) {
+        int digit = pop(&stack);
+        decimal += digit * (1 << power); 
+        power++;
+    }
+
+    printf("Decimal: %d\n", decimal);
+}
+
+// Print Binary Representation in Reverse
+
+void decimalToBinaryReverse(int decimal) {
+    Stack stack;
+    initStack(&stack);
+
+    printf("Reversed Binary: ");
+    while (decimal > 0) {
+        int remainder = decimal % 2;
+        printf("%d", remainder); 
+        push(&stack, remainder);
+        decimal /= 2;
+    }
+    printf("\n");
+}
+
+// Handle Negative Numbers
+
+void decimalToBinaryWithNegative(int decimal) {
+    Stack stack;
+    initStack(&stack);
+
+    if (decimal < 0) {
+        printf("Binary: -");
+        decimal = -decimal; 
+    }
+
+    while (decimal > 0) {
+        int remainder = decimal % 2;
+        push(&stack, remainder);
+        decimal /= 2;
+    }
+
+    while (!isEmpty(&stack)) {
+        printf("%d", pop(&stack));
+    }
+    printf("\n");
+}
+
